@@ -1,0 +1,156 @@
+package GoLang_LL
+
+import "fmt"
+
+type _LL_node struct {
+    prev *_LL_node
+    next *_LL_node
+    parent *_LL
+}
+
+type _LL struct {
+    head *_LL_node
+    tail *_LL_node
+}
+
+func (linked_list *_LL) assertNode(node *_LL_node) int {
+    if node.parent == linked_list {
+        return 1
+    }
+    return 0
+}
+
+func LL_create(head *_LL_node, tail *_LL_node) *_LL {
+    new_LL := new(_LL)
+    new_LL.head = head
+    new_LL.tail = tail
+    new_LL.head.next = tail
+    new_LL.tail.prev = head
+    return new_LL
+}
+
+func (linked_list *_LL) LL_insertBefore(new_node *_LL_node, next_node *_LL_node) {
+    if next_node == linked_list.head {
+        new_node.prev = nil
+        new_node.next = next_node
+        linked_list.head = new_node
+        next_node.prev = new_node
+    } else {
+        new_node.prev = next_node.prev
+        next_node.prev.next = new_node
+        new_node.next = next_node
+        next_node.prev = new_node
+    }
+}
+
+func (linked_list *_LL) LL_insertAfter(new_node *_LL_node, prev_node *_LL_node) {
+    if prev_node == linked_list.tail {
+        new_node.prev = prev_node
+        new_node.next = nil
+        prev_node.next = new_node
+    } else {
+        new_node.prev = prev_node
+        new_node.next = prev_node.next
+        prev_node.next.prev = new_node
+        prev_node.next = new_node
+    }
+}
+
+func (linked_list *_LL) LL_insertFirst(new_node *_LL_node) {
+    if linked_list.head == nil {
+        linked_list.tail = new_node
+    } else {
+        linked_list.LL_insertBefore(new_node, linked_list.head)
+    }
+    linked_list.head = new_node
+}
+
+func (linked_list *_LL) LL_insertLast(new_node *_LL_node) {
+    if linked_list.head == nil {
+        linked_list.tail = new_node
+    } else {
+        linked_list.LL_insertAfter(new_node, linked_list.tail)
+    }
+    linked_list.tail = new_node
+}
+
+func (linked_list *_LL) LL_deleteNode(tbd_node *_LL_node) {
+    if tbd_node == linked_list.head {
+        linked_list.head = tbd_node.next
+        tbd_node.next.prev = nil
+    } else if tbd_node == linked_list.tail {
+        linked_list.tail = tbd_node.prev
+        tbd_node.prev.next = nil
+    } else {
+        tbd_node.next.prev = tbd_node.prev
+        tbd_node.prev.next = tbd_node.next
+    }
+}
+
+func (linked_list *_LL) LL_deleteList() {
+    linked_list.head = nil
+    linked_list.tail = nil
+}
+
+func (linked_list *_LL) LL_len() int {
+    i := 0
+    current_node := linked_list.head
+    for current_node != nil {
+        i++
+        current_node = current_node.next
+    }
+    return i
+}
+
+func (linked_list *_LL) LL_print() {
+    current_node := linked_list.head
+    for current_node != nil {
+        fmt.Printf("LL_node_addr= %p LL_nextNode= %p LL_prevNode %p\n", current_node, current_node.next, current_node.prev)
+        current_node = current_node.next
+    }
+}
+
+
+func LL_test() {
+    test_head := new(_LL_node)
+    test_tail := new(_LL_node)
+    test_insertBefore := new(_LL_node)
+    test_insertAfter := new(_LL_node)
+    test_insertFirst := new(_LL_node)
+    test_insertLast := new(_LL_node)
+    
+    test_LL := LL_create(test_head, test_tail)
+    
+    fmt.Printf("Original LL\n")
+    test_LL.LL_print()
+    
+    test_LL.LL_insertBefore(test_insertBefore, test_LL.tail)
+    fmt.Printf("InsertBefore result\n")
+    test_LL.LL_print()
+    
+    test_LL.LL_insertAfter(test_insertAfter, test_insertBefore)
+    fmt.Printf("InsertAfter result\n")
+    test_LL.LL_print()
+    
+    test_LL.LL_insertFirst(test_insertFirst)
+    fmt.Printf("InsertFirst result\n")
+    test_LL.LL_print()
+    
+    test_LL.LL_insertLast(test_insertLast)
+    fmt.Printf("InsertLast result\n")
+    test_LL.LL_print()
+    
+    fmt.Printf("Length of test_LL=%d\n", test_LL.LL_len())
+    
+    test_LL.LL_deleteNode(test_head)
+    fmt.Printf("Deleting test_head\n")
+    test_LL.LL_print()
+    
+    test_LL.LL_deleteList()
+    fmt.Printf("Deleted List\n")
+    test_LL.LL_print()
+}
+
+func main() {
+    LL_test()
+}
